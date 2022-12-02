@@ -1,0 +1,35 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Mar 11 19:25:29 2022
+
+@author: christian
+"""
+
+import matplotlib.pyplot as plt
+import numpy as np
+import mge1d_util as u
+from astropy.io import fits
+from astropy.io import ascii
+import csv
+import pdb
+from astropy.stats import median_absolute_deviation as mad
+import re
+from astropy import modeling
+
+
+slope_ext = '2x_pixel_scale'
+phys_ext = '_or_10pc'
+
+names_c, slopes_c, cen_dens_c, vmags_c, stone_slopes_c, \
+    stone_dens_at_5pc_c, NSC_comp_c, lograds_c, logdens_c, dists_c = u.get_our_data(slope_ext,phys_ext,True)
+
+in_rads = 10**lograds_c[:,0] # in pc
+
+plt.figure(dpi=500)
+plt.plot(vmags_c, in_rads, linestyle='', marker='.', color='b')
+plt.plot([np.max(vmags_c),np.min(vmags_c)],[5,5],linestyle='--', color='r')
+plt.xlim(-15,-24.2)
+plt.ylim(0,32)
+plt.xlabel('M$_v$ [mag]')
+plt.ylabel('Innermost Radius [pc]')

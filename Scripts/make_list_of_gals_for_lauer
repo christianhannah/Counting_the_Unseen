@@ -1,0 +1,81 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Oct  6 12:21:17 2021
+
+@author: christian
+"""
+
+import numpy as np
+from astropy.io import ascii
+from astropy.table import Table
+from astropy.io import fits
+import pdb
+
+# read in fits table with general galaxy properties
+gal_table_filename = '/Users/christian/OneDrive/Desktop/TDE Code/Lauer2005_data/gal_properties_Lauer_2005.fit'
+# fields for this file: ['Name','Morph','Dist','r_Dist','VMAG','sigma','N','Filt','PS96','Prof','Simbad','NED','_RA','_DE','recno']
+hdul = fits.open(gal_table_filename)  # open a FITS file
+data2 = hdul[1].data 
+hdul.close()
+
+# read in fits table with general galaxy properties including R_eff from Lauer+2007
+gal_table_filename = '/Users/christian/OneDrive/Desktop/TDE Code/Lauer2007_data/gal_properties_Lauer_2007.fit'
+# fields for this file: ['Name','Morph','Dist','r_Dist','VMag','logR','r1','recno']
+hdul = fits.open(gal_table_filename)  # open a FITS file
+data3 = hdul[1].data 
+hdul.close()
+#%%
+
+final_name_list = []
+omitted_names = []
+for i in range(len(data3['name'])):
+    keep = True
+    for j in range(len(data2['name'])):
+        s = data2['name'][j].split()
+        if len(s[1]) == 3:
+            gal_name = 'NGC 0'+s[1] # for Lauer 2007 Reff table
+        else:
+            gal_name = data2['name'][j]
+        #pdb.set_trace()
+        if data3['name'][i] == gal_name:
+            keep = False
+            if gal_name == 'NGC 5845' or gal_name == 'NGC 7626':
+                keep = True
+    if keep:
+        final_name_list.append(data3['name'][i])
+    else:
+        omitted_names.append(data3['name'][i])
+      
+
+# these are the galaxies that are in Lauer95 but not in Lauer05
+lauer95_names = ['A1020-M1','A1831-M1','A2052-M1','NGC 0524','NGC 0720','NGC 1172',
+                 'NGC 1331','NGC 1400','NGC 2636','NGC 2832','NGC 2841','NGC 3599',
+                 'NGC 3605','NGC 4150','NGC 4239','NGC 4387','NGC 4434','NGC 4464',
+                 'NGC 4467','NGC 4551','NGC 4636','NGC 4697','NGC 4742','NGC 4874',
+                 'NGC 4889','NGC 5845','NGC 6166','NGC 7332','VCC 1199','VCC 1440',
+                 'VCC 1545','VCC 1627']
+
+# remove galaxies with data from Lauer1995 
+final_name_list_wo_lauer95 = []
+for i in range(len(final_name_list)):
+    if final_name_list[i] not in lauer95_names:
+        final_name_list_wo_lauer95.append(final_name_list[i])
+    else:
+        omitted_names.append(final_name_list[i])
+
+
+data = Table()
+data['Name'] = np.array(final_name_list_wo_lauer95)
+data.write('galaxy_names_corrected.dat', format='ascii', overwrite=True)
+
+
+
+
+
+
+
+
+
+
+
