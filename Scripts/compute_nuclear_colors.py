@@ -443,11 +443,14 @@ for i in range(len(wfpc2_547_814)):
 # let's add in the nuclear color measurements from Hoyer+22
 
 # read in names for Hoyer+22 sample
-table_b2_filename = '../Data_Sets/Hoyer22_data/tab_publication.ascii.csv'
-# fields: ['galaxy', 'notes', 'filter', 'pa', 'l_pa', 'u_pa', 'ell', 'l_ell', 'u_ell', 'n', 'l_n', 'u_n', 'reff', 'u_reff', 'm', 'l_m', 'u_m', 'v', 'u_v', 'i', 'u_i', 'mlr', 'u_mlr', 'logm', 'u_logm']
+table_b2_filename = '../Data_Sets/Hoyer22_data/hannah_parameters.ascii.csv'
+# fields: galaxy  instrument	channel	 band	pa	l_pa	u_pa	ell	 l_ell	
+# u_ell	n	l_n	u_n	reff	l_reff	u_reff	v(ab)	u_v(ab)	i(ab)	u_i(ab)	v(vega)	
+# u_v(vega)	i(vega)	 u_i(vega)	mlr	 u_mlr	nscmass	u_nscmass
 all_names_22 = []
 all_notes_22 = []
-all_mags_22 = []
+all_v_mags_22 = []
+all_i_mags_22 = []
 all_filts_22 = []
 
 with open(table_b2_filename, 'r') as file:
@@ -455,13 +458,15 @@ with open(table_b2_filename, 'r') as file:
     for row in reader:
         if row[0][0] != '#' and row[0][0] != 'g': # marks the start of data row
             all_names_22.append(row[0])
-            all_notes_22.append(row[1])
-            all_mags_22.append(row[14])
-            all_filts_22.append(row[2])
+            all_notes_22.append(row[1],row[2])
+            all_v_mags_22.append(row[20])
+            all_i_mags_22.append(row[22])
+            all_filts_22.append(row[3])
           
 all_names_22 = np.array(all_names_22)
 all_notes_22 = np.array(all_notes_22)
-all_mags_22 = np.array(all_mags_22)
+all_v_mags_22 = np.array(all_v_mags_22)
+all_i_mags_22 = np.array(all_i_mags_22)
 all_filts_22 = np.array(all_filts_22) 
           
 # remove galaxies where sersic indices were fixed or no fit was possible
@@ -472,27 +477,28 @@ for i in range(len(all_names_22)):
         
 names_22 = np.array(all_names_22[np.array(keep_inds).astype(int)])
 notes_22 = np.array(all_notes_22[np.array(keep_inds).astype(int)])
-mags_22 = np.array(all_mags_22[np.array(keep_inds).astype(int)])
+v_mags_22 = np.array(all_v_mags_22[np.array(keep_inds).astype(int)])
+i_mags_22 = np.array(all_i_mags_22[np.array(keep_inds).astype(int)])
 filts_22 = np.array(all_filts_22[np.array(keep_inds).astype(int)])
 
 # remove this galaxy
 names_22 = names_22[np.where(names_22 != 'eso553-046')]
 notes_22 = notes_22[np.where(names_22 != 'eso553-046')]
-mags_22 = mags_22[np.where(names_22 != 'eso553-046')]
+v_mags_22 = v_mags_22[np.where(names_22 != 'eso553-046')]
+i_mags_22 = i_mags_22[np.where(names_22 != 'eso553-046')]
 filts_22 = filts_22[np.where(names_22 != 'eso553-046')]
-#pdb.set_trace()
-names_22_uniq = np.unique(names_22)
-mags_814_22 = np.zeros(len(names_22_uniq))
-mags_606_22 = np.zeros(len(names_22_uniq))
-h22_acs_606_814 = np.zeros(len(names_22_uniq))
-for i in range(len(names_22_uniq)):
-    gal_inds = np.where(names_22 == names_22_uniq[i])[0]
-    for j in range(len(gal_inds)):
-        if filts_22[gal_inds[j]] == 'f606w':
-            mags_606_22[i] = mags_22[gal_inds[j]]
-        elif filts_22[gal_inds[j]] == 'f814w':
-            mags_814_22[i] = mags_22[gal_inds[j]]
-    h22_acs_606_814[i] = mags_606_22[i] - mags_814_22[i]
+
+# adjust the duplicate entries due to 2 filters each
+unique_inds = np.arange(0,len(names_22)+2,2)
+names_22 = names_22[unique_inds]
+notes_22 = notes_22[unique_inds]
+v_mags_22 = v_mags_22[unique_inds]
+i_mags_22 = i_mags_22[unique_inds]
+filts_22 = filts_22[unique_inds]
+
+# compute the colors
+h22_V_I = v_mags_22-i_mags_22
+
     
 
 

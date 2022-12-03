@@ -99,29 +99,30 @@ def get_density_profile(gal_name):
     all_vmags = []
     
     # Read in Hoyer+22 table b2 data for the Sersic parameters and M/L's
-    table_b2_filename = '../Data_Sets/Hoyer22_data/tab_publication.ascii.csv'
+    table_b2_filename = '../Data_Sets/Hoyer22_data/hannah_parameters.ascii.csv'
+    # fields: galaxy	instrument	channel	band	pa	l_pa	u_pa	ell	l_ell	u_ell	n	l_n	u_n	reff	l_reff	u_reff	v(ab)	u_v(ab)	i(ab)	u_i(ab)	v(vega)	u_v(vega)	i(vega)	u_i(vega)	mlr	u_mlr	nscmass	u_nscmass
     # fields: ['galaxy', 'notes', 'filter', 'pa', 'l_pa', 'u_pa', 'ell', 'l_ell', 'u_ell', 'n', 'l_n', 'u_n', 'reff', 'u_reff', 'm', 'l_m', 'u_m', 'v', 'u_v', 'i', 'u_i', 'mlr', 'u_mlr', 'logm', 'u_logm']
     with open(table_b2_filename, 'r') as file:
         reader = csv.reader(file)
         for row in reader:
             if row[0][0] != '#' and row[0][0] != 'g': # marks the start of data row
                 all_names.append(row[0])
-                if row[9] != '':
-                    all_sersic_inds.append(row[9])
+                if row[10] != '':
+                    all_sersic_inds.append(row[10])
                 else:
                     all_sersic_inds.append('-999')
-                all_filts.append(row[2])
-                all_notes.append(row[1])
-                if row[12] != '':
-                    all_r_effs.append(row[12])
+                all_filts.append(row[3])
+                all_notes.append(row[1],row[2])
+                if row[13] != '':
+                    all_r_effs.append(row[13])
                 else:
                     all_r_effs.append('-999')
-                if row[21] != '':
-                    all_M_Ls.append(row[21])
+                if row[24] != '':
+                    all_M_Ls.append(row[24])
                 else:
                     all_M_Ls.append('-999')
-                if row[17] != '':
-                    all_vmags.append(row[17])
+                if row[20] != '':
+                    all_vmags.append(row[20])
                 else:
                     all_vmags.append('-999')
     
