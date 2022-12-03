@@ -348,6 +348,44 @@ outer_rad_arcsec = np.array([0.93138189,0.23741352,0.76973705,0.38235687,0.43015
                              0.32644360,0.24809267,0.20137295,0.29379924,0.35674454,0.63614631,0.29379924,
                              1.63349997])
 
+dens_20 = np.zeros((len(gal),1000))
+rad_20 = np.zeros(1000)
+outer_pcs = np.zeros(len(gal))
+
+for i in range(0,len(gal_name)):
+	
+    pc = dists[i]*np.pi/0.648
+    radius = scales[i]*pc
+    outer_pc = outer[i]*pc
+    outer_pcs[i] = outer_pc
+    path = dir1+gal[i]+'/mge_profile_norm0.txt'
+	
+    try:
+        if (os.stat(path).st_size==0):
+            continue
+    except FileNotFoundError:
+        print (gal[i])
+        print('not found')
+        continue
+
+    data = np.loadtxt(path)
+    mass = data[:,0]*nsc_ml_col[i]
+    sigma = data[:,1]*pc
+    q = data[:,2]
+    r = np.linspace(radius,30,1000)
+    r1 = np.linspace(radius,30,1000)
+    rho,rho1 = np.zeros(len(r)),np.zeros(len(r1))
+    inc = 60*np.pi/180
+    q1 = (q**2 - (np.cos(inc)**2))/(np.sin(inc)**2)
+	
+    for k in range(0,len(r)):
+        for j in range(0,len(data)):
+            rho[k]+= mass[j]*np.exp(-(r[k]**2)/(2*sigma[j]**2))/(q1[j]*(np.sqrt(2*np.pi)*sigma[j])**3)
+            rho1[k]+= mass[j]*np.exp(-(r1[k]**2)/(2*sigma[j]**2))/(q1[j]*(np.sqrt(2*np.pi)*sigma[j])**3)
+
+    dens_20[i,:] = rho
+    rad_20 = r 
+
 
 
 

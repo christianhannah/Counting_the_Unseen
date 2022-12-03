@@ -193,6 +193,14 @@ for i in range(len(uni_names)):
             wfpc2_547_814.append(mags[uni_inds[ind547,i]] - mags[uni_inds[ind814,i]])
 
 #%%
+
+# let's add in the (1" aperture) V-I color measurments from Lauer+05
+
+
+
+
+
+#%%
 # =============================================================================
 # # define the color converion linear relations.
 # # copy and paste this below from output of compute_nuclear_colors.py
